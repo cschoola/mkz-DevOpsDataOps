@@ -1,0 +1,36 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Validar estrutura de arquivos
+        run: |
+          echo "Validando se o arquivo index.html existe..."
+          if [ ! -f site/index.html ]; then
+            echo "Arquivo index.html não encontrado!"
+            exit 1
+          else
+            echo "Arquivo encontrado!"
+          fi
+
+      - name: Rodar teste simples
+        run: |
+          echo "Rodando teste simples..."
+          grep -q "Meu primeiro deploy automatizado" site/index.html
+          echo "Teste OK"
+
+      - name: Gerar artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: site/
