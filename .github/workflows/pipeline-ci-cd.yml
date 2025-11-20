@@ -1,0 +1,59 @@
+name: Pipeline CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  ci:
+    name: Validacao (CI)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Validar estrutura do projeto
+        run: |
+          echo "Verificando existência do index.html..."
+          if [ ! -f site/index.html ]; then
+            echo "Erro: site/index.html não encontrado!"
+            exit 1
+          fi
+          echo "index.html encontrado com sucesso."
+
+      - name: Rodar teste simples
+        run: |
+          echo "Executando teste de conteúdo..."
+          grep -q "Meu primeiro deploy automatizado" site/index.html
+          echo "Teste concluído."
+
+      - name: Gerar artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-build
+          path: site/
+
+  cd:
+    name: Deploy (CD)
+    needs: ci  # <-- só executa se o CI passar com sucesso
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload do site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy para o GitHub Pages
+        uses: actions/deploy-pages@v4
