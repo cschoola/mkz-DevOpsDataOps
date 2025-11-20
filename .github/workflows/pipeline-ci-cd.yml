@@ -25,7 +25,7 @@ jobs:
       - name: Rodar teste simples
         run: |
           echo "Executando teste de conteúdo..."
-          grep -q "Meu primeiro deploy automatizado" site/index.html
+          grep -q "Verifica se hoje é Natal" site/index.html
           echo "Teste concluído."
 
       - name: Gerar artefatos
