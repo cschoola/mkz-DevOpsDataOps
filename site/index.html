@@ -1,11 +1,75 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Meu primeiro deploy automatizado</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Verifica se hoje é Natal</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #fefefe 0%, #f0f8ff 100%);
+      color: #0b3d91;
+    }
+    .card {
+      text-align: center;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(11,61,145,0.12);
+      max-width: 460px;
+    }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    p { margin: 8px 0; font-size: 16px; }
+    .yes { color: #0a8f4a; font-weight: 700; font-size: 20px; }
+    .no  { color: #c0392b; font-weight: 700; font-size: 20px; }
+    .small { color: #666; font-size: 13px; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <h1>Meu primeiro deploy automatizado no GitHub Pages!</h1>
-  <h3>Para dúviodas: @RodrigoRibeiro</h3>
+  <div class="card" role="main" aria-labelledby="title">
+    <h1 id="title">Verificador de Natal</h1>
+    <p id="message">Calculando...</p>
+    <p class="small" id="today"></p>
+  </div>
+
+  <script>
+    (function () {
+      const now = new Date(); // usa a data local do navegador
+      const month = now.getMonth(); // 0 = janeiro, 11 = dezembro
+      const day = now.getDate();    // 1..31
+
+      const messageEl = document.getElementById('message');
+      const todayEl = document.getElementById('today');
+
+      // Exibir data atual formatada (dd/mm/yyyy)
+      const dd = String(day).padStart(2, '0');
+      const mm = String(month + 1).padStart(2, '0');
+      const yyyy = now.getFullYear();
+      todayEl.textContent = `Hoje é ${dd}/${mm}/${yyyy}.`;
+
+      // Verifica se é 25 de dezembro
+      if (month === 11 && day === 25) {
+        messageEl.innerHTML = '<span class="yes">Sim — Feliz Natal! 🎄</span>';
+      } else {
+        // mostrar quantos dias faltam para o próximo 25 de dezembro
+        const currentYear = now.getFullYear();
+        const christmasThisYear = new Date(currentYear, 11, 25); // dezembro = 11
+        let target = christmasThisYear;
+        if (now > christmasThisYear) {
+          // já passou neste ano — apontar para o próximo ano
+          target = new Date(currentYear + 1, 11, 25);
+        }
+        // calcular diferença em dias (normalizando horas)
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const diffDays = Math.ceil((target.setHours(0,0,0,0) - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()) / msPerDay);
+
+        messageEl.innerHTML = `<span class="no">Não — ainda não é Natal.</span><br>Faltam <strong>${diffDays}</strong> dia(s) para o próximo Natal.`;
+      }
+    })();
+  </script>
 </body>
 </html>
